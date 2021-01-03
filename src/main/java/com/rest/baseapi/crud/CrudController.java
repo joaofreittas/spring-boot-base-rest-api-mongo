@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-public class CrudController<ENTITY, DTO> {
+public class CrudController<ENTITY> {
 
   private static final Logger log = org.slf4j.LoggerFactory.getLogger(CrudController.class);
-  private CrudService<ENTITY, DTO> service;
+  private CrudService<ENTITY> service;
 
-  public CrudController(CrudService<ENTITY, DTO> service) {
+  public CrudController(CrudService<ENTITY> service) {
     this.service = service;
   }
 
   @GetMapping
-  public ResponseEntity<ApiResponse<Page<DTO>>> list(
+  public ResponseEntity<ApiResponse<Page<ENTITY>>> list(
           @RequestParam(
                   value = "page",
                   defaultValue = PaginationConstants.DEFAULT_START_PAGE,
@@ -43,10 +43,10 @@ public class CrudController<ENTITY, DTO> {
                   required = false)
                   String dir) {
     try {
-      ApiResponse<Page<DTO>> response = new ApiResponse<>();
+      ApiResponse<Page<ENTITY>> response = new ApiResponse<>();
       PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.valueOf(dir), ord);
-      Page<DTO> dtos = service.getAllAsPageableDto(pageRequest);
-      response.setResult(dtos);
+      Page<ENTITY> entities = service.getAllPageable(pageRequest);
+      response.setResult(entities);
       return ResponseEntity.ok(response);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -55,11 +55,11 @@ public class CrudController<ENTITY, DTO> {
   }
 
   @GetMapping(value = "/{id}")
-  public ResponseEntity<ApiResponse<DTO>> getById(@PathVariable(value = "id") String id) {
-    Optional<DTO> dto = service.find(id);
-    if (dto.isPresent()) {
-      ApiResponse<DTO> response = new ApiResponse<>();
-      response.setResult(dto.get());
+  public ResponseEntity<ApiResponse<ENTITY>> getById(@PathVariable(value = "id") String id) {
+    Optional<ENTITY> ENTITY = service.find(id);
+    if (ENTITY.isPresent()) {
+      ApiResponse<ENTITY> response = new ApiResponse<>();
+      response.setResult(ENTITY.get());
       return ResponseEntity.ok(response);
     } else {
       log.warn("Not found with id = {}", id);
@@ -68,10 +68,10 @@ public class CrudController<ENTITY, DTO> {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse<DTO>> create(@RequestBody DTO dto) {
-    ApiResponse<DTO> response = new ApiResponse<>();
+  public ResponseEntity<ApiResponse<ENTITY>> create(@RequestBody ENTITY ENTITY) {
+    ApiResponse<ENTITY> response = new ApiResponse<>();
     try {
-      response.setResult(service.save(dto));
+      response.setResult(service.save(ENTITY));
       return ResponseEntity.ok(response);
     } catch (ValidationException e) {
       log.error(e.getMessage(), e);
@@ -81,13 +81,13 @@ public class CrudController<ENTITY, DTO> {
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<ApiResponse<DTO>> update(
-          @PathVariable(value = "id") String id, @RequestBody DTO newDto) {
-    ApiResponse<DTO> response = new ApiResponse<>();
+  public ResponseEntity<ApiResponse<ENTITY>> update(
+          @PathVariable(value = "id") String id, @RequestBody ENTITY newENTITY) {
+    ApiResponse<ENTITY> response = new ApiResponse<>();
     try {
-      Optional<DTO> optional = service.find(id);
+      Optional<ENTITY> optional = service.find(id);
       if (optional.isPresent()) {
-        response.setResult(service.save(newDto));
+        response.setResult(service.save(newENTITY));
         return ResponseEntity.ok(response);
       } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } catch (ValidationException e) {
@@ -100,7 +100,7 @@ public class CrudController<ENTITY, DTO> {
   @DeleteMapping(value = "/{id}")
   public ResponseEntity<ApiResponse<Object>> remove(@PathVariable(value = "id") String id) {
     try {
-      Optional<DTO> optional = service.find(id);
+      Optional<ENTITY> optional = service.find(id);
       if (optional.isPresent()) {
         service.delete(optional.get());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

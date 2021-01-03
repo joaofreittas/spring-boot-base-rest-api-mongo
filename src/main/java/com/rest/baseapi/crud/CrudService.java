@@ -8,27 +8,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-public interface CrudService<ENTITY, DTO> {
+public interface CrudService<ENTITY> {
 
   @Transactional(readOnly = true)
   List<ENTITY> getAll() throws ValidationException;
 
   @Transactional
-  Page<ENTITY> getAll(PageRequest pageRequest);
+  Page<ENTITY> getAllPageable(PageRequest pageRequest);
 
   @Transactional
-  Page<DTO> getAllAsPageableDto(PageRequest pageRequest);
+  Optional<ENTITY> find(String id);
 
-  @Transactional
-  Optional<DTO> find(String id);
+  ENTITY save(ENTITY entity) throws ValidationException;
 
-  DTO save(DTO dto) throws ValidationException;
+  void delete(ENTITY entity) throws ValidationException;
 
-  void delete(DTO dto) throws ValidationException;
+  void validSave(ENTITY entity) throws ValidationException;
 
-  void validSave(DTO dto) throws ValidationException;
-
-  void validDelete(DTO dto) throws ValidationException;
+  void validDelete(ENTITY entity) throws ValidationException;
 
 
 }

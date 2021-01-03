@@ -1,7 +1,6 @@
 package com.rest.baseapi.controller;
 
 import com.rest.baseapi.crud.CrudController;
-import com.rest.baseapi.dto.ProductDto;
 import com.rest.baseapi.entity.Product;
 import com.rest.baseapi.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(path = "/product", produces = MediaType.APPLICATION_JSON_VALUE)
-public class ProductController extends CrudController<Product, ProductDto> {
+public class ProductController extends CrudController<Product> {
 
   private ProductService service;
 
